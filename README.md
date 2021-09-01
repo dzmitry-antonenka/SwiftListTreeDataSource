@@ -6,7 +6,7 @@ List tree data souce to display hierachical data structures in lists-like way. I
 
 TreeView (iOS):        | FileViewer (macOS): 
 :-------------------------:|:-------------------------:
-<img src="https://github.com/dzmitry-antonenka/SwiftListTreeDataSource/blob/main/Examples/TreeView/TreeViewLib1_0_0.gif" width="300" height="534"> | <img src="https://github.com/dzmitry-antonenka/SwiftListTreeDataSource/blob/main/Examples/FileViewer_final/FileViewerLib1_0_0.gif" width="550" height="367">
+<img src="https://user-images.githubusercontent.com/11133998/131714349-03ec8259-9975-4835-9e79-e2f2a3c5cf54.mp4" width="300" height="534"> | <img src="https://user-images.githubusercontent.com/11133998/131739773-9528b112-e068-46ef-9f1c-fea0e746d14f.mp4" width="540" height="357">
 
 Note: `FileViewer` is a modification for [RW tutorial](https://www.raywenderlich.com/830-macos-nstableview-tutorial)
 
@@ -20,9 +20,9 @@ pod "SwiftListTreeDataSource", "1.0.0"
 ```
 
 [Swift Package Manager](https://swift.org/package-manager/):
+
 Works along with CocoaPods and others!
 You can add it directly in Xcode. File -> Swift Packages -> Add Package Dependency -> ..
-Repo URL: https://github.com/dzmitry-antonenka/SwiftListTreeDataSource.git
 
 ## Requirements:
 Swift 5.3 & Dispatch framework. Support for apple platforms starting:
