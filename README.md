@@ -124,7 +124,7 @@ let isPad = UIDevice.current.userInterfaceIdiom == .pad
 let decayCoefficient: Double = isPad ? 150 : 40
 let lvl = Double(item.level)
 let left = 11 + 10 * lvl * ( exp( -lvl / max(decayCoefficient, lvl)) )
-let leftOffset: CGFloat = min( CGFloat(left) , UIScreen.main.bounds.width - 210.0)
+let leftOffset: CGFloat = min( CGFloat(left) , UIScreen.main.bounds.width - 120.0)
 cell.lblLeadingConstraint.constant = leftOffset
 ```
 
