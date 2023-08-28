@@ -23,9 +23,14 @@ open class TreeItem<Item: Hashable>: Hashable, Identifiable {
         self.value = value
         self.parent = parent
         self.subitems = items
+        self.updateLevel()
+    }
+
+    func updateLevel() {
+        // Discussion: can be calculated automatically, but cached for performance purposes.
         self.level = level(of: self)
     }
-    
+
     public func level(of item: TreeItem<Item>) -> Int {
         // Traverse up to next parent to find level. root element has `0` level.
         var counter: Int = 0
@@ -157,7 +162,40 @@ open class ListTreeDataSource<ItemIdentifierType> where ItemIdentifierType : Has
     private func cacheTreeItems(_ treeItems: [TreeItemType]) {
         treeItems.forEach { lookupTable[$0.value] = $0 }
     }
-    
+
+    public func move(_ item: ItemIdentifierType, toIndex: Int, inParent newParent: ItemIdentifierType?) {
+        guard let existingItem = self.lookupTable[item] else { return; }
+        let toParentExistingItem = newParent.flatMap { self.lookupTable[$0] }
+        precondition(existingItem != toParentExistingItem, "Can't move item into itself, cycle: item.parent <-> item")
+
+        // Unlink from existing `parent` + subitems.
+        do {
+            let matching: (TreeItemType) -> Bool = { $0.id == existingItem.id }
+            if let existingItemParent = existingItem.parent {
+                existingItemParent.subitems.removeAll(where: matching)
+            } else {
+                backingStore.removeAll(where: matching)
+            }
+            existingItem.parent = nil
+        }
+
+        // Link new parent + subitems
+        do {
+            if let toParentExistingItem {
+                toParentExistingItem.subitems.insert(existingItem, at: toIndex)
+            } else {
+                backingStore.insert(existingItem, at: toIndex)
+            }
+            existingItem.parent = toParentExistingItem
+        }
+
+        // Update level
+        do {
+            let items = depthFirstFlattened(items: [existingItem])
+            items.forEach { $0.updateLevel() }
+        }
+    }
+
     private func insert(_ items: [ItemIdentifierType], item: ItemIdentifierType, after: Bool) {
         func insert(items: [ItemIdentifierType], into insertionArray: inout [TreeItemType],
                     existingItem: TreeItemType, after: Bool, existingItemParent: TreeItemType?) {

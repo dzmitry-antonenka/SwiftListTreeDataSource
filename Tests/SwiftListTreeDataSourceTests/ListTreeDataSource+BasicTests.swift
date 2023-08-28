@@ -36,7 +36,107 @@ class ListTreeDataSourceTests: XCTestCase {
         
         XCTAssertEqual((try XCTUnwrap(sut.backingStore.first)).value, root)
     }
-    
+
+    func test_append_withTwoElementsToNilParent_shouldAppendAsHeads() throws {
+        sut = ListTreeDataSource<OutlineItem>() // start from clean state
+
+        let root = OutlineItem(title: "Root")
+        let root2 = OutlineItem(title: "Root")
+        sut.append([root, root2], to: nil)
+        sut.reload()
+
+        XCTAssertEqual(sut.backingStore.map(\.value), [root, root2])
+    }
+
+    func test_move_withOneElementToNilParent_Identity() throws {
+        sut = ListTreeDataSource<OutlineItem>() // start from clean state
+
+        let root = OutlineItem(title: "Root")
+        sut.append([root], to: nil)
+        sut.move(root, toIndex: 0, inParent: nil)
+        sut.reload()
+
+        XCTAssertEqual((try XCTUnwrap(sut.backingStore.first)).value, root)
+    }
+
+    func test_move_withTwoElementsToNilParent_shouldSecondBecomeFirst() throws {
+        sut = ListTreeDataSource<OutlineItem>() // start from clean state
+
+        let root = OutlineItem(title: "Root")
+        let root2 = OutlineItem(title: "Root2")
+        sut.append([root, root2], to: nil)
+        sut.reload()
+
+        sut.move(root2, toIndex: 0, inParent: nil)
+
+        XCTAssertEqual(sut.backingStore.map(\.value), [root2, root])
+        XCTAssertEqual(sut.backingStore.map(\.parent), [nil, nil])
+    }
+
+    func test_move_withTwoElementsToNilParent_shouldSecondBecomeChildOfFirst() throws {
+        sut = ListTreeDataSource<OutlineItem>() // start from clean state
+
+        let root = OutlineItem(title: "Root")
+        let root2 = OutlineItem(title: "Root2")
+        sut.append([root, root2], to: nil)
+        sut.reload()
+
+        sut.move(root2, toIndex: 0, inParent: root)
+
+        XCTAssertEqual(sut.backingStore.map(\.value), [root])
+        XCTAssertEqual(sut.backingStore.map(\.level), [0])
+        XCTAssertEqual(sut.backingStore.map(\.parent), [nil])
+
+        let head = try (XCTUnwrap(sut.backingStore.first))
+        XCTAssertEqual(head.subitems.map(\.value), [root2])
+        XCTAssertEqual(head.subitems.map(\.level), [1])
+        XCTAssertEqual(head.subitems.map(\.parent), [head])
+    }
+
+    func test_move_withOneElementToParent_shouldAppendElementToParent() throws {
+        sut = ListTreeDataSource<OutlineItem>() // start from clean state
+        let root = OutlineItem(title: "Root")
+        let child = OutlineItem(title: "Child")
+        sut.append([root], to: nil)
+        sut.append([child], to: root)
+        sut.reload()
+
+        XCTAssertEqual(try XCTUnwrap(sut.lookup(root)?.level), 0)
+        XCTAssertEqual(try XCTUnwrap(sut.lookup(child)?.level), 1)
+
+        sut.move(child, toIndex: 1, inParent: nil)
+
+        XCTAssertEqual(sut.backingStore.map(\.value), [root, child])
+        XCTAssertEqual(sut.backingStore.map(\.level), [0, 0])
+        XCTAssertEqual(sut.backingStore.map(\.parent), [nil, nil])
+        XCTAssertEqual(sut.backingStore.flatMap(\.subitems), [])
+    }
+
+    func test_move_withRootElementAndChildren_shouldAppendElementsToParents() throws {
+        sut = ListTreeDataSource<OutlineItem>() // start from clean state
+        let root1 = OutlineItem(title: "Root1")
+        let root1Child1 = OutlineItem(title: "Root1.Child1")
+        sut.append([root1], to: nil)
+        sut.append([root1Child1], to: root1)
+
+        let root2 = OutlineItem(title: "Root2")
+        let root2Child1 = OutlineItem(title: "Root2.Child1")
+        let root2Child2 = OutlineItem(title: "Root2.Child2")
+        sut.append([root2], to: nil)
+        sut.append([root2Child1, root2Child2], to: root2)
+
+        sut.reload()
+
+        let root2Child2Node = try XCTUnwrap(sut.lookup(root2Child2))
+        let root2Child2NodeOldParent = try XCTUnwrap(root2Child2Node.parent)
+        sut.move(root2Child2, toIndex: 1, inParent: root1)
+
+        let root1Node = try XCTUnwrap(sut.lookup(root1))
+        XCTAssertFalse(root2Child2NodeOldParent.subitems.map(\.value).contains(root2Child2))
+        XCTAssertEqual(root2Child2Node.parent, root1Node)
+        XCTAssertEqual(root1Node.subitems[1], root2Child2Node)
+    }
+
     func test_append_withOneElementToParent_shouldAppendElementToParent() throws {
         let root = OutlineItem(title: "Root")
         let child = OutlineItem(title: "Child")
