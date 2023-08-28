@@ -1,5 +1,7 @@
 # SwiftListTreeDataSource
 
+[![Swift](https://github.com/dzmitry-antonenka/SwiftListTreeDataSource/actions/workflows/swift.yml/badge.svg)](https://github.com/dzmitry-antonenka/SwiftListTreeDataSource/actions/workflows/swift.yml)
+
 List tree data souce to display hierachical data structures in lists-like way. It's UI agnostic, just like view-model, so can be used with UITableView/UICollectionView/NSTableView/SwiftUI or in console application.
 
 ## Demo:
