@@ -49,6 +49,17 @@ Add/Insert/Delete - quick helper methods:
 addItems(items, itemChildren: { $0.subitems }, to: listTreeDataSource)
 ```
 
+Fold (inorder traversal + map into final result):
+Use case: changes were made and we need final tree. FO 
+```
+let folded = listTreeDataSource.fold(NodeTestItem.init) { item, subitems in
+    NodeTestItem(identifier: item.identifier, title: item.title, subitems: subitems)
+}
+
+Or Fold with Identity (when element already hierarchical item):
+let folded = sut.fold({ $0 }) { root, _ in root }
+```
+
 Add/Insert/Delete/Move - More grannular control:
 ```
 // Append:
@@ -63,8 +74,9 @@ listTreeDataSource.delete([itemToDelete])
 
 // Move:
 // E.g. user drags `existingNode` into `newParent` subitems with 0 index.
-// existingNode = listTreeDataSource.items[sourceIdx] 
+// existingNode = listTreeDataSource.items[sourceIdx];
 // newParent = listTreeDataSource.items[dropParentIdx];
+// toIndex = drop index in newParent;
 listTreeDataSource.move(existingNode, toIndex: 0, inParent: newParent)
 
 // NOTE: Reload data source at the end of changes.
