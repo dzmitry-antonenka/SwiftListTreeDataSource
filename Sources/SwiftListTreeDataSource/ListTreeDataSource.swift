@@ -41,7 +41,19 @@ open class TreeItem<Item: Hashable>: Hashable, Identifiable {
         }
         return counter
     }
-    
+
+    public func fold<Result>(_ leaf: (Item) -> Result, cons: (Item, [Result]) -> Result) -> Result {
+        switch self.subitems {
+        case []:
+            return leaf(self.value)
+        case let nodes:
+            return cons(
+                self.value,
+                nodes.map { $0.fold(leaf, cons: cons) }
+            )
+        }
+    }
+
     public func allParents(of item: TreeItem<Item>) -> [TreeItem<Item>] {
         var parents: [TreeItem<Item>] = []
         var currentItem: TreeItem<Item> = item
@@ -89,7 +101,18 @@ open class ListTreeDataSource<ItemIdentifierType> where ItemIdentifierType : Has
     func setShownFlatItems(_ items: [TreeItemType]) {
         self.shownFlatItems = items
     }
-        
+
+    /// Folds created hierarchical store.
+    /// - Parameters:
+    ///   - leaf: The leaf case
+    ///   - cons: The cons case
+    /// - Returns: The folded hierarchical store.
+    public func fold<Result>(_ leaf: (ItemIdentifierType) -> Result, cons: (ItemIdentifierType, [Result]) -> Result) -> [Result] {
+        backingStore.map { node in
+            node.fold(leaf, cons: cons)
+        }
+    }
+
     /// Adds the array of `items` to specified `parent`.
     /// - Parameters:
     ///   - items: The array of items to add.

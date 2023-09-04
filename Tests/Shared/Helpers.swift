@@ -4,7 +4,9 @@ import Foundation
 public func addItems(_ items: [OutlineItem], to snapshot: ListTreeDataSource<OutlineItem>) {
     addItems(items, itemChildren: { $0.subitems }, to: snapshot)
 }
-
+public func addItems(_ items: [NodeTestItem], to snapshot: ListTreeDataSource<NodeTestItem>) {
+    addItems(items, itemChildren: { $0.subitems }, to: snapshot)
+}
 public func depthFirstFlattened(items: [OutlineItem]) -> [OutlineItem] {
     return depthFirstFlattened(items: items, itemChildren: { $0.subitems })
 }

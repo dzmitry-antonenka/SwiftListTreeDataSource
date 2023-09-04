@@ -24,8 +24,32 @@ class ListTreeDataSourceTests: XCTestCase {
     func setUpSut() {
         sut = ListTreeDataSource<OutlineItem>()
     }
-    
-    // MARK: - Append/Insert/Delete tests
+
+    func test_foldRecreate_withTinyDataSet_shouldMatchIdentity() {
+        let sut = ListTreeDataSource<NodeTestItem>()
+
+        let dataSet = DataManager.shared.mockDataTiny.items.map(NodeTestItem.init(outline:))
+        addItems(dataSet, to: sut)
+        sut.reload()
+
+        let folded = sut.fold(NodeTestItem.init) { item, subitems in
+            NodeTestItem(identifier: item.identifier, title: item.title, subitems: subitems)
+        }
+        XCTAssertEqual(dataSet, folded)
+    }
+
+    func test_foldId_withTinyDataSet_shouldMatchIdentity() {
+        let sut = ListTreeDataSource<NodeTestItem>()
+
+        let dataSet = DataManager.shared.mockDataTiny.items.map(NodeTestItem.init(outline:))
+        addItems(dataSet, to: sut)
+        sut.reload()
+
+        let folded = sut.fold(id(_:)) { root, _ in root }
+        XCTAssertEqual(dataSet, folded)
+    }
+
+    // MARK: - Append/Insert/Delete/Move tests
     
     func test_append_withOneElementToNilParent_shouldAppendAsHead() throws {
         sut = ListTreeDataSource<OutlineItem>() // start from clean state
@@ -459,4 +483,4 @@ class ListTreeDataSourceTests: XCTestCase {
     }
 }
 
-
+func id<A>(_ a: A) -> A { a }
