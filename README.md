@@ -47,7 +47,7 @@ Add/Insert/Delete - quick helper methods:
 addItems(items, itemChildren: { $0.subitems }, to: listTreeDataSource)
 ```
 
-Add/Insert/Delete - More grannular control:
+Add/Insert/Delete/Move - More grannular control:
 ```
 // Append:
 listTreeDataSource.append(currentToAdd, to: referenceParent)
@@ -58,6 +58,12 @@ listTreeDataSource.insert([insertionAfterItem], after: existingItem)
 
 // Delete:
 listTreeDataSource.delete([itemToDelete])
+
+// Move:
+// E.g. user drags `existingNode` into `newParent` subitems with 0 index.
+// existingNode = listTreeDataSource.items[sourceIdx] 
+// newParent = listTreeDataSource.items[dropParentIdx];
+listTreeDataSource.move(existingNode, toIndex: 0, inParent: newParent)
 
 // NOTE: Reload data source at the end of changes.
 listTreeDataSource.reload()
