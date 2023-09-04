@@ -56,7 +56,9 @@ class ListTreeDataSourceTests: XCTestCase {
         sut.move(root, toIndex: 0, inParent: nil)
         sut.reload()
 
-        XCTAssertEqual((try XCTUnwrap(sut.backingStore.first)).value, root)
+        XCTAssertEqual(sut.backingStore.map(\.parent), [nil])
+        XCTAssertEqual(sut.backingStore.map(\.value), [root])
+        XCTAssertEqual(sut.backingStore.map(\.level), [0])
     }
 
     func test_move_withTwoElementsToNilParent_shouldSecondBecomeFirst() throws {
@@ -69,8 +71,9 @@ class ListTreeDataSourceTests: XCTestCase {
 
         sut.move(root2, toIndex: 0, inParent: nil)
 
-        XCTAssertEqual(sut.backingStore.map(\.value), [root2, root])
         XCTAssertEqual(sut.backingStore.map(\.parent), [nil, nil])
+        XCTAssertEqual(sut.backingStore.map(\.value), [root2, root])
+        XCTAssertEqual(sut.backingStore.map(\.level), [0, 0])
     }
 
     func test_move_withTwoElementsToNilParent_shouldSecondBecomeChildOfFirst() throws {
@@ -83,14 +86,15 @@ class ListTreeDataSourceTests: XCTestCase {
 
         sut.move(root2, toIndex: 0, inParent: root)
 
+        XCTAssertEqual(sut.backingStore.map(\.parent), [nil])
         XCTAssertEqual(sut.backingStore.map(\.value), [root])
         XCTAssertEqual(sut.backingStore.map(\.level), [0])
-        XCTAssertEqual(sut.backingStore.map(\.parent), [nil])
 
+        XCTAssertEqual(sut.backingStore.count, 1)
         let head = try (XCTUnwrap(sut.backingStore.first))
+        XCTAssertEqual(head.subitems.map(\.parent), [head])
         XCTAssertEqual(head.subitems.map(\.value), [root2])
         XCTAssertEqual(head.subitems.map(\.level), [1])
-        XCTAssertEqual(head.subitems.map(\.parent), [head])
     }
 
     func test_move_withOneElementToParent_shouldAppendElementToParent() throws {
@@ -106,9 +110,9 @@ class ListTreeDataSourceTests: XCTestCase {
 
         sut.move(child, toIndex: 1, inParent: nil)
 
+        XCTAssertEqual(sut.backingStore.map(\.parent), [nil, nil])
         XCTAssertEqual(sut.backingStore.map(\.value), [root, child])
         XCTAssertEqual(sut.backingStore.map(\.level), [0, 0])
-        XCTAssertEqual(sut.backingStore.map(\.parent), [nil, nil])
         XCTAssertEqual(sut.backingStore.flatMap(\.subitems), [])
     }
 
@@ -122,19 +126,64 @@ class ListTreeDataSourceTests: XCTestCase {
         let root2 = OutlineItem(title: "Root2")
         let root2Child1 = OutlineItem(title: "Root2.Child1")
         let root2Child2 = OutlineItem(title: "Root2.Child2")
+        let root2Child2Child1 = OutlineItem(title: "Root2.Child2.Child1")
         sut.append([root2], to: nil)
         sut.append([root2Child1, root2Child2], to: root2)
+        sut.append([root2Child2Child1], to: root2Child2)
 
         sut.reload()
 
+        let root2Node = try XCTUnwrap(sut.lookup(root2))
+        let root1Child1Node = try XCTUnwrap(sut.lookup(root1Child1))
         let root2Child2Node = try XCTUnwrap(sut.lookup(root2Child2))
+        let root2Child2NodeChildren_BeforeMove = root2Child2Node.subitems
+        let root2Child2NodeChildren_BeforeMoveFlattened = depthFirstFlattened(items: root2Child2NodeChildren_BeforeMove)
+            .map { (parent: $0.parent?.value, level: $0.level, value: $0.value) }
         let root2Child2NodeOldParent = try XCTUnwrap(root2Child2Node.parent)
-        sut.move(root2Child2, toIndex: 1, inParent: root1)
+        let root2Child2NodeOldParentParent = try XCTUnwrap(root2Child2Node.parent).parent
+        sut.move(root2Child2, toIndex: 0, inParent: root1Child1)
+
+        XCTAssertEqual(sut.backingStore.map(\.parent), [nil, nil])
+        XCTAssertEqual(sut.backingStore.map(\.value), [root1, root2])
+        XCTAssertEqual(sut.backingStore.map(\.level), [0, 0])
 
         let root1Node = try XCTUnwrap(sut.lookup(root1))
+        XCTAssertEqual(root1Node.level, 0)
+
+        // Verify `root2Child2Node` moved to `root1Child1Node`
+        // root1Node
+        //      | root1Child1Node
+        //            | <- root2Child2Node.parent
+        XCTAssertEqual(root2Child2Node.parent, root1Child1Node)
+        XCTAssertEqual(root2Child2Node.level, 2)
+
+        // Verify `root1Child1Node` has inserted `root2Child2Node`
+        // root1Node
+        //      | root1Child1Node
+        //            | [root2Child2Node]
+        XCTAssertEqual(root1Child1Node.subitems, [root2Child2Node])
+
+        // Verify old parent of `root2Child2Node` doesn't reference `root2Child2`
+        // root2Node
+        //       ..
+        //     | root2Child2NodeOldParent
+        //              |-- ..... children not include `root2Child2`
         XCTAssertFalse(root2Child2NodeOldParent.subitems.map(\.value).contains(root2Child2))
-        XCTAssertEqual(root2Child2Node.parent, root1Node)
-        XCTAssertEqual(root1Node.subitems[1], root2Child2Node)
+        XCTAssertEqual(root2Child2NodeOldParent.level, 0)
+        XCTAssertEqual(root2Child2NodeOldParent, root2Node)
+        XCTAssertNil(root2Child2NodeOldParentParent)
+
+        // Verify `root2Child2Node` children keeped
+        let root2Child2NodeChildren_AfterMove = root2Child2Node.subitems
+        let root2Child2NodeChildren_AfterMoveFlattened = depthFirstFlattened(items: root2Child2NodeChildren_AfterMove)
+            .map { (parent: $0.parent?.value, level: $0.level, value: $0.value) }
+
+        XCTAssertEqual(root2Child2NodeChildren_AfterMoveFlattened.count, root2Child2NodeChildren_BeforeMoveFlattened.count)
+        for (subchildBefore, subchildAfter) in zip(root2Child2NodeChildren_BeforeMoveFlattened, root2Child2NodeChildren_AfterMoveFlattened) {
+            XCTAssertEqual(subchildAfter.parent, subchildBefore.parent)
+            XCTAssertEqual(subchildAfter.level, subchildBefore.level + 1) // moved +1 level deeper
+            XCTAssertEqual(subchildAfter.value, subchildBefore.value)
+        }
     }
 
     func test_append_withOneElementToParent_shouldAppendElementToParent() throws {
