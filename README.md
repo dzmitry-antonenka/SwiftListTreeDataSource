@@ -50,7 +50,7 @@ addItems(items, itemChildren: { $0.subitems }, to: listTreeDataSource)
 ```
 
 Fold (inorder traversal + map into final result):
-Use case: changes were made and we need final tree. FO 
+Use case: changes were made and we need final tree.
 ```
 let folded = listTreeDataSource.fold({ ResultItem(item: $0) }) { item, subitems in
     ResultItem(identifier: item.identifier, title: item.title, subitems: subitems)
