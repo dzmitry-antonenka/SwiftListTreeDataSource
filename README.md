@@ -52,11 +52,11 @@ addItems(items, itemChildren: { $0.subitems }, to: listTreeDataSource)
 Fold (inorder traversal + map into final result):
 Use case: changes were made and we need final tree. FO 
 ```
-let folded = listTreeDataSource.fold(NodeTestItem.init) { item, subitems in
-    NodeTestItem(identifier: item.identifier, title: item.title, subitems: subitems)
+let folded = listTreeDataSource.fold({ ResultItem(item: $0) }) { item, subitems in
+    ResultItem(identifier: item.identifier, title: item.title, subitems: subitems)
 }
 
-Or Fold with Identity (when element already hierarchical item):
+// Or Fold with Identity (when element already hierarchical item):
 let folded = sut.fold({ $0 }) { root, _ in root }
 ```
 
