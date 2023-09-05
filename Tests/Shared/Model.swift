@@ -44,15 +44,21 @@ public struct NodeTestItem: Hashable {
     public let identifier: UUID
     public let title: String
     public var subitems: [NodeTestItem]
-    public init(identifier: UUID, title: String, subitems: [NodeTestItem]) {
+    public init(identifier: UUID, title: String, subitems: [NodeTestItem] = []) {
         self.identifier = identifier
         self.title = title
         self.subitems = subitems
     }
 }
 extension NodeTestItem {
+    public init(leaf: NodeTestItem) {
+        self.init(identifier: leaf.identifier, title: leaf.title, subitems: [])
+    }
     public init(_ item: NodeTestItem) {
         self.init(identifier: item.identifier, title: item.title, subitems: item.subitems)
+    }
+    public init(_ item: NodeTestItem, children: [NodeTestItem]) {
+        self.init(identifier: item.identifier, title: item.title, subitems: children)
     }
     public init(outline: OutlineItem) {
         identifier = outline.identifier
