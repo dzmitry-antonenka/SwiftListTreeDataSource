@@ -24,8 +24,32 @@ class ListTreeDataSourceTests: XCTestCase {
     func setUpSut() {
         sut = ListTreeDataSource<OutlineItem>()
     }
-    
-    // MARK: - Append/Insert/Delete tests
+
+    func test_foldRecreate_withTinyDataSet_shouldMatchIdentity() {
+        let sut = ListTreeDataSource<NodeTestItem>()
+
+        let dataSet = DataManager.shared.mockDataTiny.items.map(NodeTestItem.init(outline:))
+        addItems(dataSet, to: sut)
+        sut.reload()
+
+        let folded = sut.fold(NodeTestItem.init(leaf:)) { item, subitems in
+            NodeTestItem(identifier: item.identifier, title: item.title, subitems: subitems)
+        }
+        XCTAssertEqual(dataSet, folded)
+    }
+
+    func test_foldId_withTinyDataSet_shouldMatchIdentity() {
+        let sut = ListTreeDataSource<NodeTestItem>()
+
+        let dataSet = DataManager.shared.mockDataTiny.items.map(NodeTestItem.init(outline:))
+        addItems(dataSet, to: sut)
+        sut.reload()
+
+        let folded = sut.fold(id(_:)) { root, _ in root }
+        XCTAssertEqual(dataSet, folded)
+    }
+
+    // MARK: - Append/Insert/Delete/Move tests
     
     func test_append_withOneElementToNilParent_shouldAppendAsHead() throws {
         sut = ListTreeDataSource<OutlineItem>() // start from clean state
@@ -36,7 +60,223 @@ class ListTreeDataSourceTests: XCTestCase {
         
         XCTAssertEqual((try XCTUnwrap(sut.backingStore.first)).value, root)
     }
-    
+
+    func test_append_withTwoElementsToNilParent_shouldAppendAsHeads() throws {
+        sut = ListTreeDataSource<OutlineItem>() // start from clean state
+
+        let root = OutlineItem(title: "Root")
+        let root2 = OutlineItem(title: "Root")
+        sut.append([root, root2], to: nil)
+        sut.reload()
+
+        XCTAssertEqual(sut.backingStore.map(\.value), [root, root2])
+    }
+
+    func test_move_withOneElementToNilParent_Identity() throws {
+        sut = ListTreeDataSource<OutlineItem>() // start from clean state
+
+        let root = OutlineItem(title: "Root")
+        sut.append([root], to: nil)
+        sut.move(root, toIndex: 0, inParent: nil)
+        sut.reload()
+
+        XCTAssertEqual(sut.backingStore.map(\.parent), [nil])
+        XCTAssertEqual(sut.backingStore.map(\.value), [root])
+        XCTAssertEqual(sut.backingStore.map(\.level), [0])
+    }
+
+    func test_move_withTwoElementsToNilParent_shouldSecondBecomeFirst() throws {
+        let sut = ListTreeDataSource<NodeTestItem>() // start from clean state
+
+        let dummyId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+        let dataSet: [NodeTestItem] = [
+            OutlineItem(identifier: dummyId, title: "Root"),
+            OutlineItem(identifier: dummyId, title: "Root2")
+        ].map(NodeTestItem.init)
+
+        let root = dataSet[0]; let root2 = dataSet[1]
+
+        addItems(dataSet, to: sut)
+        sut.reload()
+
+        sut.move(root2, toIndex: 0, inParent: nil)
+
+        XCTAssertEqual(sut.backingStore.map(\.parent), [nil, nil])
+        XCTAssertEqual(sut.backingStore.map(\.value), [root2, root])
+        XCTAssertEqual(sut.backingStore.map(\.level), [0, 0])
+
+        // Verify folded result
+        let folded = sut.fold(NodeTestItem.init(leaf:), cons: NodeTestItem.init)
+        XCTAssertEqual(
+            folded, [
+                NodeTestItem(identifier: dummyId, title: "Root2"),
+                NodeTestItem(identifier: dummyId, title: "Root")
+            ]
+        )
+    }
+
+    func test_move_withTwoElementsToNilParent_shouldSecondBecomeChildOfFirst() throws {
+        let sut = ListTreeDataSource<NodeTestItem>() // start from clean state
+
+        let dummyId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+        let dataSet: [NodeTestItem] = [
+            OutlineItem(identifier: dummyId, title: "Root"),
+            OutlineItem(identifier: dummyId, title: "Root2")
+        ].map(NodeTestItem.init)
+
+        let root = dataSet[0]; let root2 = dataSet[1]
+
+        addItems(dataSet, to: sut)
+        sut.reload()
+
+        sut.move(root2, toIndex: 0, inParent: root)
+
+        XCTAssertEqual(sut.backingStore.map(\.parent), [nil])
+        XCTAssertEqual(sut.backingStore.map(\.value), [root])
+        XCTAssertEqual(sut.backingStore.map(\.level), [0])
+
+        XCTAssertEqual(sut.backingStore.count, 1)
+        let head = try (XCTUnwrap(sut.backingStore.first))
+        XCTAssertEqual(head.subitems.map(\.parent), [head])
+        XCTAssertEqual(head.subitems.map(\.value), [root2])
+        XCTAssertEqual(head.subitems.map(\.level), [1])
+
+        // Verify folded result
+        let folded = sut.fold(NodeTestItem.init(leaf:), cons: NodeTestItem.init)
+        XCTAssertEqual(
+            folded, [
+                NodeTestItem(identifier: dummyId, title: "Root", subitems: [
+                    NodeTestItem(identifier: dummyId, title: "Root2")
+                ])
+            ]
+        )
+    }
+
+    func test_move_withOneElementToParent_shouldChildBecomeSecondRoot() throws {
+        let sut = ListTreeDataSource<NodeTestItem>() // start from clean state
+        let dummyId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+        let dataSet: [NodeTestItem] = [
+            OutlineItem(identifier: dummyId, title: "Root", subitems: [
+                OutlineItem(identifier: dummyId, title: "Child")
+            ])
+        ].map(NodeTestItem.init)
+
+        let root = dataSet[0]; let child = root.subitems[0]
+
+        addItems(dataSet, to: sut)
+        sut.reload()
+
+        XCTAssertEqual(try XCTUnwrap(sut.lookup(root)?.level), 0)
+        XCTAssertEqual(try XCTUnwrap(sut.lookup(child)?.level), 1)
+
+        sut.move(child, toIndex: 1, inParent: nil)
+
+        XCTAssertEqual(sut.backingStore.map(\.parent), [nil, nil])
+        XCTAssertEqual(sut.backingStore.map(\.value), [root, child])
+        XCTAssertEqual(sut.backingStore.map(\.level), [0, 0])
+        XCTAssertEqual(sut.backingStore.flatMap(\.subitems), [])
+
+        // Verify folded result
+        let folded = sut.fold(NodeTestItem.init(leaf:), cons: NodeTestItem.init)
+        XCTAssertEqual(
+            folded, [
+                NodeTestItem(identifier: dummyId, title: "Root"),
+                NodeTestItem(identifier: dummyId, title: "Child")
+            ]
+        )
+    }
+
+    func test_move_withRootElementAndChildren_shouldRoot2Child2MoveToRoot1Child1() throws {
+        let sut = ListTreeDataSource<NodeTestItem>() // start from clean state
+        let dummyId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+        let dataSet: [NodeTestItem] = [
+            OutlineItem(identifier: dummyId, title: "Root1", subitems: [
+                OutlineItem(identifier: dummyId, title: "Root1.Child1")
+            ]),
+            OutlineItem(identifier: dummyId, title: "Root2", subitems: [
+                OutlineItem(identifier: dummyId, title: "Root2.Child1"),
+                OutlineItem(identifier: dummyId, title: "Root2.Child2", subitems: [
+                    OutlineItem(identifier: dummyId, title: "Root2.Child2.Child1")
+                ])
+            ])
+        ].map(NodeTestItem.init(outline:))
+
+        let root1 = dataSet[0]; let root1Child1 = root1.subitems[0]
+        let root2 = dataSet[1]; let root2Child2 = root2.subitems[1]
+
+        addItems(dataSet, to: sut)
+        sut.reload()
+
+        let root2Node = try XCTUnwrap(sut.lookup(root2))
+        let root1Child1Node = try XCTUnwrap(sut.lookup(root1Child1))
+        let root2Child2Node = try XCTUnwrap(sut.lookup(root2Child2))
+        let root2Child2NodeChildren_BeforeMove = root2Child2Node.subitems
+        let root2Child2NodeChildren_BeforeMoveFlattened = depthFirstFlattened(items: root2Child2NodeChildren_BeforeMove)
+            .map { (parent: $0.parent?.value, level: $0.level, value: $0.value) }
+        let root2Child2NodeOldParent = try XCTUnwrap(root2Child2Node.parent)
+        let root2Child2NodeOldParentParent = try XCTUnwrap(root2Child2Node.parent).parent
+        sut.move(root2Child2, toIndex: 0, inParent: root1Child1)
+
+        XCTAssertEqual(sut.backingStore.map(\.parent), [nil, nil])
+        XCTAssertEqual(sut.backingStore.map(\.value), [root1, root2])
+        XCTAssertEqual(sut.backingStore.map(\.level), [0, 0])
+
+        let root1Node = try XCTUnwrap(sut.lookup(root1))
+        XCTAssertEqual(root1Node.level, 0)
+
+        // Verify `root2Child2Node` moved to `root1Child1Node`
+        // root1Node
+        //      | root1Child1Node
+        //            | <- root2Child2Node.parent
+        XCTAssertEqual(root2Child2Node.parent, root1Child1Node)
+        XCTAssertEqual(root2Child2Node.level, 2)
+
+        // Verify `root1Child1Node` has inserted `root2Child2Node`
+        // root1Node
+        //      | root1Child1Node
+        //            | [root2Child2Node]
+        XCTAssertEqual(root1Child1Node.subitems, [root2Child2Node])
+
+        // Verify old parent of `root2Child2Node` doesn't reference `root2Child2`
+        // root2Node
+        //       ..
+        //     | root2Child2NodeOldParent
+        //              |-- ..... children not include `root2Child2`
+        XCTAssertFalse(root2Child2NodeOldParent.subitems.map(\.value).contains(root2Child2))
+        XCTAssertEqual(root2Child2NodeOldParent.level, 0)
+        XCTAssertEqual(root2Child2NodeOldParent, root2Node)
+        XCTAssertNil(root2Child2NodeOldParentParent)
+
+        // Verify `root2Child2Node` children keeped
+        let root2Child2NodeChildren_AfterMove = root2Child2Node.subitems
+        let root2Child2NodeChildren_AfterMoveFlattened = depthFirstFlattened(items: root2Child2NodeChildren_AfterMove)
+            .map { (parent: $0.parent?.value, level: $0.level, value: $0.value) }
+
+        XCTAssertEqual(root2Child2NodeChildren_AfterMoveFlattened.count, root2Child2NodeChildren_BeforeMoveFlattened.count)
+        for (subchildBefore, subchildAfter) in zip(root2Child2NodeChildren_BeforeMoveFlattened, root2Child2NodeChildren_AfterMoveFlattened) {
+            XCTAssertEqual(subchildAfter.parent, subchildBefore.parent)
+            XCTAssertEqual(subchildAfter.level, subchildBefore.level + 1) // moved +1 level deeper
+            XCTAssertEqual(subchildAfter.value, subchildBefore.value)
+        }
+
+        // Verify folded result
+        let folded = sut.fold(NodeTestItem.init(leaf:), cons: NodeTestItem.init)
+        XCTAssertEqual(
+            folded, [
+                NodeTestItem(identifier: dummyId, title: "Root1", subitems: [
+                    NodeTestItem(identifier: dummyId, title: "Root1.Child1", subitems: [
+                        NodeTestItem(identifier: dummyId, title: "Root2.Child2", subitems: [
+                            NodeTestItem(identifier: dummyId, title: "Root2.Child2.Child1")
+                        ])
+                    ])
+                ]),
+                NodeTestItem(identifier: dummyId, title: "Root2", subitems: [
+                    NodeTestItem(identifier: dummyId, title: "Root2.Child1")
+                ])
+            ]
+        )
+    }
+
     func test_append_withOneElementToParent_shouldAppendElementToParent() throws {
         let root = OutlineItem(title: "Root")
         let child = OutlineItem(title: "Child")
@@ -310,4 +550,4 @@ class ListTreeDataSourceTests: XCTestCase {
     }
 }
 
-
+func id<A>(_ a: A) -> A { a }

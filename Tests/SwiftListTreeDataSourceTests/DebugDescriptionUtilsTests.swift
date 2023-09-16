@@ -110,18 +110,9 @@ class DebugDescriptionUtilsTests: XCTestCase {
     // MARK: - Helpers
     
     func tinyHardcodedDataset() -> [OutlineItem] {
-        return [
-            OutlineItem(title: "Level 0, item1", subitems: [
-                OutlineItem(title: "Level 1, item1"),
-                OutlineItem(title: "Level 1, item2", subitems: [
-                    OutlineItem(title: "Level 2, item1"),
-                    OutlineItem(title: "Level 2, item2")
-                ])
-            ]),
-            OutlineItem(title: "Level 0, item2")
-        ]
+        DataManager.shared.mockDataTiny.items
     }
-    
+
     func verifyExpandedLevelsDescriptionsMatchesTopLevelForFlattenedItems() {
         let backingStoreExpandedLevelsDescription = debugDescriptionExpandedLevels(sut.backingStore)
         let flattenedItemsTopLevelsDescription = debugDescriptionTopLevel(sut.items)

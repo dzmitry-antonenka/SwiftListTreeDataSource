@@ -23,9 +23,14 @@ open class TreeItem<Item: Hashable>: Hashable, Identifiable {
         self.value = value
         self.parent = parent
         self.subitems = items
+        self.updateLevel()
+    }
+
+    func updateLevel() {
+        // Discussion: can be calculated automatically, but cached for performance purposes.
         self.level = level(of: self)
     }
-    
+
     public func level(of item: TreeItem<Item>) -> Int {
         // Traverse up to next parent to find level. root element has `0` level.
         var counter: Int = 0
@@ -36,7 +41,19 @@ open class TreeItem<Item: Hashable>: Hashable, Identifiable {
         }
         return counter
     }
-    
+
+    public func fold<Result>(_ leaf: (Item) -> Result, cons: (Item, [Result]) -> Result) -> Result {
+        switch self.subitems {
+        case []:
+            return leaf(self.value)
+        case let nodes:
+            return cons(
+                self.value,
+                nodes.map { $0.fold(leaf, cons: cons) }
+            )
+        }
+    }
+
     public func allParents(of item: TreeItem<Item>) -> [TreeItem<Item>] {
         var parents: [TreeItem<Item>] = []
         var currentItem: TreeItem<Item> = item
@@ -84,7 +101,18 @@ open class ListTreeDataSource<ItemIdentifierType> where ItemIdentifierType : Has
     func setShownFlatItems(_ items: [TreeItemType]) {
         self.shownFlatItems = items
     }
-        
+
+    /// Folds created hierarchical store.
+    /// - Parameters:
+    ///   - leaf: The leaf case
+    ///   - cons: The cons case
+    /// - Returns: The folded hierarchical store.
+    public func fold<Result>(_ leaf: (ItemIdentifierType) -> Result, cons: (ItemIdentifierType, [Result]) -> Result) -> [Result] {
+        backingStore.map { node in
+            node.fold(leaf, cons: cons)
+        }
+    }
+
     /// Adds the array of `items` to specified `parent`.
     /// - Parameters:
     ///   - items: The array of items to add.
@@ -157,7 +185,40 @@ open class ListTreeDataSource<ItemIdentifierType> where ItemIdentifierType : Has
     private func cacheTreeItems(_ treeItems: [TreeItemType]) {
         treeItems.forEach { lookupTable[$0.value] = $0 }
     }
-    
+
+    public func move(_ item: ItemIdentifierType, toIndex: Int, inParent newParent: ItemIdentifierType?) {
+        guard let existingItem = self.lookupTable[item] else { return; }
+        let toParentExistingItem = newParent.flatMap { self.lookupTable[$0] }
+        precondition(existingItem != toParentExistingItem, "Can't move item into itself, cycle: item.parent <-> item")
+
+        // Unlink from existing `parent` + subitems.
+        do {
+            let matching: (TreeItemType) -> Bool = { $0.id == existingItem.id }
+            if let existingItemParent = existingItem.parent {
+                existingItemParent.subitems.removeAll(where: matching)
+            } else {
+                backingStore.removeAll(where: matching)
+            }
+            existingItem.parent = nil
+        }
+
+        // Link new parent + subitems
+        do {
+            if let toParentExistingItem {
+                toParentExistingItem.subitems.insert(existingItem, at: toIndex)
+            } else {
+                backingStore.insert(existingItem, at: toIndex)
+            }
+            existingItem.parent = toParentExistingItem
+        }
+
+        // Update level
+        do {
+            let items = depthFirstFlattened(items: [existingItem])
+            items.forEach { $0.updateLevel() }
+        }
+    }
+
     private func insert(_ items: [ItemIdentifierType], item: ItemIdentifierType, after: Bool) {
         func insert(items: [ItemIdentifierType], into insertionArray: inout [TreeItemType],
                     existingItem: TreeItemType, after: Bool, existingItemParent: TreeItemType?) {

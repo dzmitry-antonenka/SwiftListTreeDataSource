@@ -94,6 +94,10 @@ open class FilterableListTreeDataSource<ItemIdentifierType>: ListTreeDataSource<
         super.append(items, to: parent)
         needRebuildAllFlattenedItemStore = true
     }
+    public override func move(_ item: ItemIdentifierType, toIndex: Int, inParent: ItemIdentifierType?) {
+        super.move(item, toIndex: toIndex, inParent: inParent)
+        needRebuildAllFlattenedItemStore = true
+    }
     public override func insert(_ items: [ItemIdentifierType], after item: ItemIdentifierType) {
         super.insert(items, after: item)
         needRebuildAllFlattenedItemStore = true

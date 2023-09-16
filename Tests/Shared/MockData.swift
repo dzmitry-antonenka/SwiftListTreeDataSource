@@ -5,7 +5,6 @@
 //  Created by Dzmitry Antonenka on 18.04.21.
 //
 
-import TestsShared
 import Foundation
 
 struct DataSet {
@@ -25,7 +24,21 @@ struct DataSet {
         // Total elements in tree: (Int) $R0 = 7_174_452, creation time ~17.5 sec on MBP 2019, core i7
         return menuItems(targetNestLevel: 14, currentLevel: 0, itemsInSection: 3)
     }()
-    
+
+    static var mockDataTiny: [OutlineItem] = {
+        var items: [OutlineItem] = [
+            OutlineItem(title: "Level 0, item1", subitems: [
+                OutlineItem(title: "Level 1, item1"),
+                OutlineItem(title: "Level 1, item2", subitems: [
+                    OutlineItem(title: "Level 2, item1"),
+                    OutlineItem(title: "Level 2, item2")
+                ])
+            ]),
+            OutlineItem(title: "Level 0, item2")
+        ]
+        return items
+    }()
+
     static var mockDataSmall: [OutlineItem] = {
         var items: [OutlineItem] = [
                 OutlineItem(title: "Compositional Layout", subitems: [
@@ -92,16 +105,17 @@ struct DataSet {
     }
 }
 
-
-enum MockData {
+public enum MockData {
+    case tiny
     case small
     case large88K
     case large350K
     case doubleLarge797K
     case extraLarge7_2M
-    
-    var items: [OutlineItem] {
+
+    public var items: [OutlineItem] {
         switch self {
+        case .tiny: return DataSet.mockDataTiny
         case .small: return DataSet.mockDataSmall
         case .large88K: return DataSet.mockData88K
         case .large350K: return DataSet.mockData350K
@@ -111,15 +125,16 @@ enum MockData {
     }
 }
 
-class DataManager {
-    static let shared = DataManager()
+public class DataManager {
+    public static let shared = DataManager()
         
-    var mockData: MockData { self.mockDataSmall }
+    public var mockData: MockData { self.mockDataSmall }
     
     // specialized data sets
-    lazy var mockDataSmall: MockData = .small
-    lazy var mockDataLarge88K: MockData = .large88K
-    lazy var mockDataLarge350K: MockData = .large350K
-    lazy var mockDataDoubleLarge797K: MockData = .doubleLarge797K
-    lazy var mockDataExtraLarge7_2M: MockData = .extraLarge7_2M
+    public lazy var mockDataTiny: MockData = .tiny
+    public lazy var mockDataSmall: MockData = .small
+    public lazy var mockDataLarge88K: MockData = .large88K
+    public lazy var mockDataLarge350K: MockData = .large350K
+    public lazy var mockDataDoubleLarge797K: MockData = .doubleLarge797K
+    public lazy var mockDataExtraLarge7_2M: MockData = .extraLarge7_2M
 }
