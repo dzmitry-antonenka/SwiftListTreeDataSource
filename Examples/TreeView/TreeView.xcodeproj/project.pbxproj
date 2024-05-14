@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,8 @@
 		089A27232607D85A00F907DA /* OutlineItemDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089A27222607D85A00F907DA /* OutlineItemDataSet.swift */; };
 		08FD01D526E01B6400902DD3 /* SwiftListTreeDataSource in Frameworks */ = {isa = PBXBuildFile; productRef = 08FD01D426E01B6400902DD3 /* SwiftListTreeDataSource */; };
 		C14ABAA32913568C5599EFDC /* Pods_TreeView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F0E7D30A446750D518E9158 /* Pods_TreeView.framework */; };
+		D81696802BF39C25009E72D6 /* SwiftListTreeDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D816967D2BF39C25009E72D6 /* SwiftListTreeDataStore.swift */; };
+		D81696812BF39C25009E72D6 /* SwiftUIListWithSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = D816967E2BF39C25009E72D6 /* SwiftUIListWithSearch.swift */; };
 		D8334087253842DD00AE6894 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8334086253842DD00AE6894 /* AppDelegate.swift */; };
 		D8334089253842DD00AE6894 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8334088253842DD00AE6894 /* SceneDelegate.swift */; };
 		D833408B253842DD00AE6894 /* TableController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D833408A253842DD00AE6894 /* TableController.swift */; };
@@ -39,6 +41,8 @@
 		118780C5A4BC1E8A19A6C46C /* Pods-TreeView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TreeView.debug.xcconfig"; path = "Target Support Files/Pods-TreeView/Pods-TreeView.debug.xcconfig"; sourceTree = "<group>"; };
 		B75FFCE4889C0CB4B68C83A9 /* Pods-test.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-test.release.xcconfig"; path = "Target Support Files/Pods-test/Pods-test.release.xcconfig"; sourceTree = "<group>"; };
 		CE453948DCB18D06CD0B5362 /* Pods-test.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-test.debug.xcconfig"; path = "Target Support Files/Pods-test/Pods-test.debug.xcconfig"; sourceTree = "<group>"; };
+		D816967D2BF39C25009E72D6 /* SwiftListTreeDataStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftListTreeDataStore.swift; sourceTree = "<group>"; };
+		D816967E2BF39C25009E72D6 /* SwiftUIListWithSearch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUIListWithSearch.swift; sourceTree = "<group>"; };
 		D8334083253842DD00AE6894 /* TreeView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreeView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8334086253842DD00AE6894 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D8334088253842DD00AE6894 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -87,6 +91,15 @@
 				0D57EDABE9B0B60A53F11AD4 /* Pods-TreeView.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		D816967F2BF39C25009E72D6 /* SwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				D816967D2BF39C25009E72D6 /* SwiftListTreeDataStore.swift */,
+				D816967E2BF39C25009E72D6 /* SwiftUIListWithSearch.swift */,
+			);
+			path = SwiftUI;
 			sourceTree = "<group>";
 		};
 		D833407A253842DD00AE6894 = {
@@ -143,6 +156,7 @@
 		D8F452672539C99C00F10963 /* SwiftListTreeDataSource */ = {
 			isa = PBXGroup;
 			children = (
+				D816967F2BF39C25009E72D6 /* SwiftUI */,
 				D833408A253842DD00AE6894 /* TableController.swift */,
 				D8F452F6253A44CE00F10963 /* TableWithSearchController.swift */,
 			);
@@ -294,12 +308,14 @@
 				D8F452FA253A475400F10963 /* Debouncer.swift in Sources */,
 				D8F45301253A669600F10963 /* UISearchBar+ActivityIndicator.swift in Sources */,
 				083930262618A7FF008E23A9 /* DataManager.swift in Sources */,
+				D81696802BF39C25009E72D6 /* SwiftListTreeDataStore.swift in Sources */,
 				D8F4526F2539CCEE00F10963 /* Cell.swift in Sources */,
 				089A27232607D85A00F907DA /* OutlineItemDataSet.swift in Sources */,
 				D8334087253842DD00AE6894 /* AppDelegate.swift in Sources */,
 				D8F452CA2539DDAE00F10963 /* OutlineViewController.swift in Sources */,
 				D8334089253842DD00AE6894 /* SceneDelegate.swift in Sources */,
 				D8F4525C2539C8A500F10963 /* TreeViewController+RATreeView.swift in Sources */,
+				D81696812BF39C25009E72D6 /* SwiftUIListWithSearch.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -451,6 +467,7 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 72S6RY2PDS;
 				INFOPLIST_FILE = TreeView/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -473,6 +490,7 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 72S6RY2PDS;
 				INFOPLIST_FILE = TreeView/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -514,7 +532,7 @@
 			repositoryURL = "https://github.com/dzmitry-antonenka/SwiftListTreeDataSource";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 1.0.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

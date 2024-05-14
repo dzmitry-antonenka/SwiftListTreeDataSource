@@ -1,0 +1,15 @@
+{
+  "originHash" : "d90efac5006e6cfc4f45128ec29308b20565b7e098329fa9ec76262ffef9fc26",
+  "pins" : [
+    {
+      "identity" : "swiftlisttreedatasource",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dzmitry-antonenka/SwiftListTreeDataSource",
+      "state" : {
+        "revision" : "9304960bf037df233be89a7e91e8fd062f352f49",
+        "version" : "1.0.1"
+      }
+    }
+  ],
+  "version" : 3
+}
