@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,7 +11,6 @@
 		086D5379262C743A00E7B920 /* Queue-Optimized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 086D5378262C743A00E7B920 /* Queue-Optimized.swift */; };
 		086D537D262C7A5A00E7B920 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 086D537C262C7A5A00E7B920 /* Utils.swift */; };
 		089A27232607D85A00F907DA /* OutlineItemDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089A27222607D85A00F907DA /* OutlineItemDataSet.swift */; };
-		08FD01D526E01B6400902DD3 /* SwiftListTreeDataSource in Frameworks */ = {isa = PBXBuildFile; productRef = 08FD01D426E01B6400902DD3 /* SwiftListTreeDataSource */; };
 		C14ABAA32913568C5599EFDC /* Pods_TreeView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F0E7D30A446750D518E9158 /* Pods_TreeView.framework */; };
 		D81696802BF39C25009E72D6 /* SwiftListTreeDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D816967D2BF39C25009E72D6 /* SwiftListTreeDataStore.swift */; };
 		D81696812BF39C25009E72D6 /* SwiftUIListWithSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = D816967E2BF39C25009E72D6 /* SwiftUIListWithSearch.swift */; };
@@ -21,6 +20,8 @@
 		D833408E253842DD00AE6894 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D833408C253842DD00AE6894 /* Main.storyboard */; };
 		D8334090253842E000AE6894 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D833408F253842E000AE6894 /* Assets.xcassets */; };
 		D8334093253842E000AE6894 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D8334091253842E000AE6894 /* LaunchScreen.storyboard */; };
+		D8AD1ADD2D84A79E006E2326 /* TableViewDragAndDropSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8AD1ADC2D84A79E006E2326 /* TableViewDragAndDropSupport.swift */; };
+		D8CFE6D72D848F8C001CE3C3 /* SwiftListTreeDataSource in Frameworks */ = {isa = PBXBuildFile; productRef = D8CFE6D62D848F8C001CE3C3 /* SwiftListTreeDataSource */; };
 		D8F4525C2539C8A500F10963 /* TreeViewController+RATreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F4525B2539C8A500F10963 /* TreeViewController+RATreeView.swift */; };
 		D8F452642539C93200F10963 /* OutlineItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F452632539C93200F10963 /* OutlineItem.swift */; };
 		D8F4526C2539CCE500F10963 /* Cell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D8F4526B2539CCE500F10963 /* Cell.xib */; };
@@ -51,6 +52,7 @@
 		D833408F253842E000AE6894 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D8334092253842E000AE6894 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D8334094253842E000AE6894 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D8AD1ADC2D84A79E006E2326 /* TableViewDragAndDropSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewDragAndDropSupport.swift; sourceTree = "<group>"; };
 		D8F4525B2539C8A500F10963 /* TreeViewController+RATreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TreeViewController+RATreeView.swift"; sourceTree = "<group>"; };
 		D8F452632539C93200F10963 /* OutlineItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineItem.swift; sourceTree = "<group>"; };
 		D8F4526B2539CCE500F10963 /* Cell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Cell.xib; sourceTree = "<group>"; };
@@ -67,7 +69,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C14ABAA32913568C5599EFDC /* Pods_TreeView.framework in Frameworks */,
-				08FD01D526E01B6400902DD3 /* SwiftListTreeDataSource in Frameworks */,
+				D8CFE6D72D848F8C001CE3C3 /* SwiftListTreeDataSource in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,6 +161,7 @@
 				D816967F2BF39C25009E72D6 /* SwiftUI */,
 				D833408A253842DD00AE6894 /* TableController.swift */,
 				D8F452F6253A44CE00F10963 /* TableWithSearchController.swift */,
+				D8AD1ADC2D84A79E006E2326 /* TableViewDragAndDropSupport.swift */,
 			);
 			path = SwiftListTreeDataSource;
 			sourceTree = "<group>";
@@ -198,7 +201,7 @@
 			);
 			name = TreeView;
 			packageProductDependencies = (
-				08FD01D426E01B6400902DD3 /* SwiftListTreeDataSource */,
+				D8CFE6D62D848F8C001CE3C3 /* SwiftListTreeDataSource */,
 			);
 			productName = test;
 			productReference = D8334083253842DD00AE6894 /* TreeView.app */;
@@ -228,7 +231,7 @@
 			);
 			mainGroup = D833407A253842DD00AE6894;
 			packageReferences = (
-				08FD01D326E01B6400902DD3 /* XCRemoteSwiftPackageReference "SwiftListTreeDataSource" */,
+				D8CFE6D52D848F8C001CE3C3 /* XCLocalSwiftPackageReference "../../../SwiftListTreeDataSource" */,
 			);
 			productRefGroup = D8334084253842DD00AE6894 /* Products */;
 			projectDirPath = "";
@@ -311,6 +314,7 @@
 				D81696802BF39C25009E72D6 /* SwiftListTreeDataStore.swift in Sources */,
 				D8F4526F2539CCEE00F10963 /* Cell.swift in Sources */,
 				089A27232607D85A00F907DA /* OutlineItemDataSet.swift in Sources */,
+				D8AD1ADD2D84A79E006E2326 /* TableViewDragAndDropSupport.swift in Sources */,
 				D8334087253842DD00AE6894 /* AppDelegate.swift in Sources */,
 				D8F452CA2539DDAE00F10963 /* OutlineViewController.swift in Sources */,
 				D8334089253842DD00AE6894 /* SceneDelegate.swift in Sources */,

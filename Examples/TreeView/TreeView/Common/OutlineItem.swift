@@ -7,7 +7,7 @@
 
 import Foundation
 
-class OutlineItem: Hashable {
+class OutlineItem: Identifiable, Hashable, Codable {
     let title: String
     var subitems: [OutlineItem]
 
@@ -22,7 +22,8 @@ class OutlineItem: Hashable {
     static func == (lhs: OutlineItem, rhs: OutlineItem) -> Bool {
         return lhs.identifier == rhs.identifier
     }
-    private let identifier = UUID()
+    private var identifier = UUID()
+    var id: UUID { identifier }
 }
 
 extension OutlineItem: CustomStringConvertible {

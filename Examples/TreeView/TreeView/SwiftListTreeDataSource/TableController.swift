@@ -25,7 +25,8 @@ class TableController: UITableViewController {
         addItems(items, to: dataSource)
         return dataSource
     }()
-    
+    var dragAndDropController: TableViewDragAndDropSupport<OutlineItem>!
+
     @available(iOS 13.0, *)
     private(set) lazy var diffableDataSource: UITableViewDiffableDataSource<Section, TreeItemType> = {
         return self.createDiffableDataSource()
@@ -40,11 +41,12 @@ class TableController: UITableViewController {
         
         setupTableView()
         setupDataSource()
+        configureDragAndDrop()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        reloadUI()
+        updateUI()
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -60,7 +62,8 @@ class TableController: UITableViewController {
         cell.lbl?.text = item.value.title
         cell.lblLeadingConstraint.constant = CGFloat(left)
         cell.disclosureImageView.isHidden = item.subitems.isEmpty
-        
+        cell.contentView.backgroundColor = .systemBackground
+
         let transform = CGAffineTransform.init(rotationAngle: item.isExpanded ? CGFloat.pi/2.0 : 0)
         cell.disclosureImageView.transform = transform
                 
@@ -79,9 +82,30 @@ class TableController: UITableViewController {
             }
         }
         
-        self.reloadUI(animating: true)
+        self.updateUI(animating: true)
     }
-    
+
+    // MARK: - Row Swipe to Delete
+    /// Provide a trailing swipe action for "Delete"
+    override func tableView(_ tableView: UITableView,
+                            trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath)
+    -> UISwipeActionsConfiguration? {
+        
+        let node = listTreeDataSource.items[indexPath.row]
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] _, _, complete in
+            guard let self = self else { return }
+            
+            // Deleting a node also removes its entire subtree
+            self.listTreeDataSource.delete([node.value])
+            self.listTreeDataSource.reload()
+            self.updateUI(animating: true)
+            
+            complete(true)
+        }
+        return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
+
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
@@ -103,15 +127,26 @@ extension TableController {
             self.tableView.dataSource = self
         }
     }
-    func reloadUI(animating: Bool = true) {
+
+    func updateUI(animating: Bool = true, reloadIds: [ListTreeDataSource<OutlineItem>.TreeItemType] = []) {
         if isOS13Available {
-            var diffableSnaphot = NSDiffableDataSourceSnapshot<Section, TreeItemType>()
+            var diffableSnaphot = NSDiffableDataSourceSnapshot<Section, ListTreeDataSource<OutlineItem>.TreeItemType>()
             diffableSnaphot.appendSections([.main])
             diffableSnaphot.appendItems(listTreeDataSource.items, toSection: .main)
+            diffableSnaphot.reloadItems(reloadIds)
             self.diffableDataSource.apply(diffableSnaphot, animatingDifferences: animating)
         } else {
             self.tableView.reloadData()
         }
+    }
+
+    private func configureDragAndDrop() {
+        dragAndDropController = TableViewDragAndDropSupport(dataSource: self.listTreeDataSource, tableView: self.tableView, updateUI: { [weak self] animating, reloadIds in
+            self?.updateUI(animating:animating, reloadIds:reloadIds)
+        })
+        tableView.dragInteractionEnabled = true
+        tableView.dragDelegate = dragAndDropController
+        tableView.dropDelegate = dragAndDropController
     }
 }
 
@@ -119,11 +154,11 @@ extension TableController {
 fileprivate extension TableController {
     @IBAction func collapseAll(_ sender: UIBarButtonItem) {
         listTreeDataSource.collapseAll()
-        reloadUI(animating: false) // `false` to stay on the safe side for batch update in large data set
+        updateUI(animating: false) // `false` to stay on the safe side for batch update in large data set
     }
     @IBAction func expandAll(_ sender: UIBarButtonItem) {
         listTreeDataSource.expandAll()
-        reloadUI(animating: false) // `false` to stay on the safe side for batch update in large data set
+        updateUI(animating: false) // `false` to stay on the safe side for batch update in large data set
     }
 }
 

@@ -24,11 +24,12 @@ class TableWithSearchController: UIViewController {
     
     var displayMode: DisplayMode = .standard
     var debouncer = Debouncer()
-        
+    var dragAndDropController: TableViewDragAndDropSupport<OutlineItem>!
+    
     lazy var listTreeDataSource: FilterableListTreeDataSource<OutlineItem> = {
-        var dataSource = FilterableListTreeDataSource<OutlineItem>()
-        addItems(items, to: dataSource)
-        return dataSource
+        var listTreeDataSource = FilterableListTreeDataSource<OutlineItem>()
+        addItems(items, to: listTreeDataSource)
+        return listTreeDataSource
     }()
     
     @available(iOS 13.0, *)
@@ -41,18 +42,20 @@ class TableWithSearchController: UIViewController {
         setupTableView()
         setupDataSource()
         setupBarButtonItems()
+        configureDragAndDrop()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        reloadUI()
+        updateUI()
     }
     
-    func reloadUI(animating: Bool = true) {
+    func updateUI(animating: Bool = true, reloadIds: [ListTreeDataSource<OutlineItem>.TreeItemType] = []) {
         if isOS13Available {
             var diffableSnaphot = NSDiffableDataSourceSnapshot<Section, ListTreeDataSource<OutlineItem>.TreeItemType>()
             diffableSnaphot.appendSections([.main])
             diffableSnaphot.appendItems(listTreeDataSource.items, toSection: .main)
+            diffableSnaphot.reloadItems(reloadIds)
             self.diffableDataSource.apply(diffableSnaphot, animatingDifferences: animating)
         } else {
             self.tableView.reloadData()
@@ -63,17 +66,17 @@ class TableWithSearchController: UIViewController {
         if !searchText.isEmpty {
             self.searchBar.isLoading = true
             self.displayMode = .filtering(text: searchText)
-
+            
             self.listTreeDataSource.filterItemsKeepingParents(by: { $0.title.lowercased().contains(searchText.lowercased()) }) { [weak self] in
                 guard let self = self else { return }
                 self.searchBar.isLoading = false
-                self.reloadUI(animating: false)
+                self.updateUI(animating: false)
             }
         } else {
             self.displayMode = .standard
             self.searchBar.isLoading = false
             self.listTreeDataSource.resetFiltering(collapsingAll: true)
-            self.reloadUI(animating: false)
+            self.updateUI(animating: false)
         }
     }
 }
@@ -132,9 +135,30 @@ extension TableWithSearchController: UITableViewDataSource, UITableViewDelegate 
             }
         }
         
-        self.reloadUI(animating: true)
+        self.updateUI(animating: true)
     }
-    
+
+    // MARK: - Row Swipe to Delete
+    /// Provide a trailing swipe action for "Delete"
+    func tableView(_ tableView: UITableView,
+                            trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath)
+    -> UISwipeActionsConfiguration? {
+        
+        let node = listTreeDataSource.items[indexPath.row]
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] _, _, complete in
+            guard let self = self else { return }
+            
+            // Deleting a node also removes its entire subtree
+            self.listTreeDataSource.delete([node.value])
+            self.listTreeDataSource.reload()
+            self.updateUI(animating: true)
+            
+            complete(true)
+        }
+        return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
@@ -144,10 +168,33 @@ extension TableWithSearchController: UITableViewDataSource, UITableViewDelegate 
     }
 }
 
+@available(iOS 13, *)
+fileprivate extension TableWithSearchController {
+    func createDiffableDataSource() -> UITableViewDiffableDataSource<Section, ListTreeDataSource<OutlineItem>.TreeItemType> {
+        let listTreeDataSource = UITableViewDiffableDataSource<Section, ListTreeDataSource<OutlineItem>.TreeItemType>(
+            tableView: tableView,
+            cellProvider: { tableView, indexPath, _ in
+                return self.tableView(self.tableView, cellForRowAt: indexPath)
+            }
+        )
+        return listTreeDataSource
+    }
+}
+
+// MARK: - Setup
 extension TableWithSearchController {
     func setupTableView() {
         tableView.register(UINib(nibName: "Cell", bundle: nil), forCellReuseIdentifier: "Cell")
         tableView.register(DetailTextCell.self, forCellReuseIdentifier: "TitleDetailCell")
+    }
+    
+    private func configureDragAndDrop() {
+        dragAndDropController = TableViewDragAndDropSupport(dataSource: self.listTreeDataSource, tableView: self.tableView, updateUI: { [weak self] animating, reloadIds in
+            self?.updateUI(animating:animating, reloadIds:reloadIds)
+        })
+        tableView.dragInteractionEnabled = true
+        tableView.dragDelegate = dragAndDropController
+        tableView.dropDelegate = dragAndDropController
     }
     
     func setupBarButtonItems() {
@@ -159,18 +206,5 @@ extension TableWithSearchController {
         } else {
             self.tableView.dataSource = self
         }
-    }
-}
-
-@available(iOS 13, *)
-fileprivate extension TableWithSearchController {
-    func createDiffableDataSource() -> UITableViewDiffableDataSource<Section, ListTreeDataSource<OutlineItem>.TreeItemType> {
-        let dataSource = UITableViewDiffableDataSource<Section, ListTreeDataSource<OutlineItem>.TreeItemType>(
-            tableView: tableView,
-            cellProvider: { tableView, indexPath, _ in
-                return self.tableView(self.tableView, cellForRowAt: indexPath)
-            }
-        )
-        return dataSource
     }
 }

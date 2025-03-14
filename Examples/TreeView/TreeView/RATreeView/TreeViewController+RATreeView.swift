@@ -28,7 +28,7 @@ class TreeViewController: UIViewController, RATreeViewDelegate, RATreeViewDataSo
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         setupTreeView()
     }
 
