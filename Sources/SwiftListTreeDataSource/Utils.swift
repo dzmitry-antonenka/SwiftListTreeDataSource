@@ -25,6 +25,10 @@ func depthFirstFlattened<Item: Hashable>(items: [TreeItem<Item>]) -> [TreeItem<I
     return depthFirstFlattened(items: items, itemChildren: { $0.subitems })
 }
 
+public func allDescendants<Item: Hashable>(of node: TreeItem<Item>) -> [TreeItem<Item>] {
+    depthFirstFlattened(items: [node])
+}
+
 func depthFirstFlattened<Item>(items: [Item], itemChildren: (Item) -> [Item], filter: (Item) -> Bool = { _ in true }) -> [Item] {
     var outFlatStore: Array< Item > = []
     

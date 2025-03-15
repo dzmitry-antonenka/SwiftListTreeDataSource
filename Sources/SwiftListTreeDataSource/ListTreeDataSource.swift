@@ -176,7 +176,7 @@ open class ListTreeDataSource<ItemIdentifierType> where ItemIdentifierType : Has
     }
 
     /// Lookup for `item` tree node.
-    func lookup(_ item: ItemIdentifierType) -> TreeItemType? {
+    public func lookup(_ item: ItemIdentifierType) -> TreeItemType? {
         return self.lookupTable[item]
     }
     
