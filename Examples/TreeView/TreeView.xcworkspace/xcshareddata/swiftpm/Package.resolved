@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/dzmitry-antonenka/SwiftListTreeDataSource",
       "state" : {
-        "revision" : "9304960bf037df233be89a7e91e8fd062f352f49",
-        "version" : "1.0.1"
+        "revision" : "ed2a7387ff59ac3a13a300be8fb993d57023a951",
+        "version" : "1.0.2"
       }
     }
   ],

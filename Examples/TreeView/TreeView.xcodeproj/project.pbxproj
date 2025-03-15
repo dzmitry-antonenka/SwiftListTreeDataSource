@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -21,7 +21,8 @@
 		D8334090253842E000AE6894 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D833408F253842E000AE6894 /* Assets.xcassets */; };
 		D8334093253842E000AE6894 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D8334091253842E000AE6894 /* LaunchScreen.storyboard */; };
 		D8AD1ADD2D84A79E006E2326 /* TableViewDragAndDropSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8AD1ADC2D84A79E006E2326 /* TableViewDragAndDropSupport.swift */; };
-		D8CFE6D72D848F8C001CE3C3 /* SwiftListTreeDataSource in Frameworks */ = {isa = PBXBuildFile; productRef = D8CFE6D62D848F8C001CE3C3 /* SwiftListTreeDataSource */; };
+		D8AD1AF92D86006A006E2326 /* SwiftListTreeDataSource in Frameworks */ = {isa = PBXBuildFile; productRef = D8AD1AF82D86006A006E2326 /* SwiftListTreeDataSource */; };
+		D8CFE6D72D848F8C001CE3C3 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		D8F4525C2539C8A500F10963 /* TreeViewController+RATreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F4525B2539C8A500F10963 /* TreeViewController+RATreeView.swift */; };
 		D8F452642539C93200F10963 /* OutlineItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F452632539C93200F10963 /* OutlineItem.swift */; };
 		D8F4526C2539CCE500F10963 /* Cell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D8F4526B2539CCE500F10963 /* Cell.xib */; };
@@ -69,7 +70,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				C14ABAA32913568C5599EFDC /* Pods_TreeView.framework in Frameworks */,
-				D8CFE6D72D848F8C001CE3C3 /* SwiftListTreeDataSource in Frameworks */,
+				D8AD1AF92D86006A006E2326 /* SwiftListTreeDataSource in Frameworks */,
+				D8CFE6D72D848F8C001CE3C3 /* (null) in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,7 +203,7 @@
 			);
 			name = TreeView;
 			packageProductDependencies = (
-				D8CFE6D62D848F8C001CE3C3 /* SwiftListTreeDataSource */,
+				D8AD1AF82D86006A006E2326 /* SwiftListTreeDataSource */,
 			);
 			productName = test;
 			productReference = D8334083253842DD00AE6894 /* TreeView.app */;
@@ -231,7 +233,7 @@
 			);
 			mainGroup = D833407A253842DD00AE6894;
 			packageReferences = (
-				D8CFE6D52D848F8C001CE3C3 /* XCLocalSwiftPackageReference "../../../SwiftListTreeDataSource" */,
+				D8AD1AF72D86006A006E2326 /* XCRemoteSwiftPackageReference "SwiftListTreeDataSource" */,
 			);
 			productRefGroup = D8334084253842DD00AE6894 /* Products */;
 			projectDirPath = "";
@@ -531,20 +533,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		08FD01D326E01B6400902DD3 /* XCRemoteSwiftPackageReference "SwiftListTreeDataSource" */ = {
+		D8AD1AF72D86006A006E2326 /* XCRemoteSwiftPackageReference "SwiftListTreeDataSource" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/dzmitry-antonenka/SwiftListTreeDataSource";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.1;
+				minimumVersion = 1.0.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		08FD01D426E01B6400902DD3 /* SwiftListTreeDataSource */ = {
+		D8AD1AF82D86006A006E2326 /* SwiftListTreeDataSource */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 08FD01D326E01B6400902DD3 /* XCRemoteSwiftPackageReference "SwiftListTreeDataSource" */;
+			package = D8AD1AF72D86006A006E2326 /* XCRemoteSwiftPackageReference "SwiftListTreeDataSource" */;
 			productName = SwiftListTreeDataSource;
 		};
 /* End XCSwiftPackageProductDependency section */
