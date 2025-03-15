@@ -16,11 +16,12 @@ class Cell: UITableViewCell {
     func configure(with item: ListTreeDataSource<OutlineItem>.TreeItemType, searchText: String? = nil) {
         let left = 11 + 10 * item.level
         
-        let mattrString = NSMutableAttributedString(string: item.value.title, attributes: [ .foregroundColor: UIColor.black ])
+        let mattrString = NSMutableAttributedString(string: item.value.title, attributes: [ .foregroundColor: UIColor.label ])
         if let searchText = searchText, !searchText.isEmpty {
             let range = (item.value.title.lowercased() as NSString).range(of: searchText.lowercased())
             mattrString.addAttributes([
-                .font: UIFont.systemFont(ofSize: 17, weight: .semibold)
+                .font: UIFont.systemFont(ofSize: 17, weight: .semibold),
+                .foregroundColor: UIColor.tintColor
             ], range: range)
         }
 
