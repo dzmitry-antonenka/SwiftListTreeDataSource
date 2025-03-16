@@ -8,7 +8,7 @@ List tree data souce to display hierachical data structures in lists-like way. I
 
 TreeView (iOS):        | FileViewer (macOS): 
 :-------------------------:|:-------------------------:
-<img src="https://github.com/user-attachments/assets/97f89c1b-f615-4efd-b435-8229319a744b" width="311" height="677"> | <img src="https://user-images.githubusercontent.com/11133998/131739773-9528b112-e068-46ef-9f1c-fea0e746d14f.mp4" width="540" height="350">
+<img src="https://github.com/user-attachments/assets/f4b977db-5a5c-40cb-8a4f-ee4b8267e971" width="311" height="677"> | <img src="https://user-images.githubusercontent.com/11133998/131739773-9528b112-e068-46ef-9f1c-fea0e746d14f.mp4" width="540" height="350">
 
 Note: `FileViewer` is a modification for [RW tutorial](https://www.raywenderlich.com/830-macos-nstableview-tutorial)
 
